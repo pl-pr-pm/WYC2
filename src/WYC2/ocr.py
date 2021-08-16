@@ -6,6 +6,7 @@ import pyocr.builders
 import logging
 import config
 from src.WYC2.utils import _logger_setup
+import re
 
 """
 対象の画像をOCRする
@@ -17,7 +18,7 @@ class OCR():
         self.tool = self._init_ocr_tool()
 
         """
-        OCRの初期化
+        ocrツールの初期化
         """
     def _init_ocr_tool(self):
         tools = pyocr.get_available_tools()
@@ -33,11 +34,11 @@ class OCR():
         対象のファイルを読み込み、読み取った文章を返却する
 
         Params:
-        Str: target_file
+        str: target_file
         OCR対象のファイルパス
 
         Returns:
-        Str: text
+        str: retText
         OCR結果の文章
         """
     def analysis(self, target_file):
@@ -47,7 +48,38 @@ class OCR():
              builder=pyocr.builders.TextBuilder(tesseract_layout=6)
         )
         self.logger.debug("OCR Result: '%s'" % (text))
-        return text
-    
+
+        # 空白をトリミング
+        retText = self._trim_jpn_space(text)
+
+        return retText
+
+        """
+        日本語の間に入った空白を削除
+        ocr実行時、日本語の間に空白が入る場合があり、その空白を削除する
+
+        e.g. 今日 は testを 行 なった
+        -> 今日はtest を行なった
+        英字の場合、一律次の文言に空白を追加する
+        それ以外の場合、空白を削除
+
+        strの組み込み関数の場合、漢字を誤認識するとのことから、reモジュールを利用
+
+        Params:
+        str: text
+        ocrの結果文章
+
+        Returns:
+        str: text
+        空白をトリミングした文章
+        """
     def _trim_jpn_space(self, text):
-        
+        r = re.compile(r'^[a-zA-Z]+$')
+        words = text.split(' ')
+        ret = ''
+        for word in words:
+            if r.match(word):
+               ret = ret + word + ' '
+            else:
+               ret = ret + word
+        return ret
