@@ -2,7 +2,7 @@ from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import PatternMatchingEventHandler
 from ocr import OCR
 from clip_copy import ClipCopy
-
+import config
 """
 ディレクトリ内の変更を検知時のハンドラ
 
@@ -14,7 +14,7 @@ https://pythonhosted.org/watchdog/api.html?highlight=observe#watchdog.events.Fil
 
 """
 class WatchEventHandler(PatternMatchingEventHandler):
-    def __init__(self, patterns=['*.jpg']):
+    def __init__(self, patterns=config.TARGET_EXTENTION):
         super().__init__(patterns)
         self.ocr = OCR()
 
