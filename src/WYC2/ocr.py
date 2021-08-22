@@ -15,7 +15,6 @@ logger = _logger_setup(logging.DEBUG)
 
 class OCR():
     def __init__(self):
-        #self.logger = _logger_setup(logging.DEBUG)
         self.tool = self._init_ocr_tool()
 
         """
@@ -45,8 +44,11 @@ class OCR():
 
     @time_func(logger)
     def analysis(self, target_file):
+        image = Image.open(target_file)
+        resize_image = self._resize_img(image)
         text = self.tool.image_to_string(
-             Image.open(target_file),
+             #Image.open(target_file),
+             resize_image,
              lang=config.LANG,
              builder=pyocr.builders.TextBuilder(tesseract_layout=6)
         )
@@ -87,3 +89,24 @@ class OCR():
             else:
                ret = ret + word
         return ret
+    
+        """
+        アスペクト比を保ちながら拡大する
+        
+        Params:
+        Image: image
+        リサイズ対象画像
+        
+        Returns:
+        Image: image.resize()
+        リサイズしたImage
+        """
+    
+    @time_func(logger)
+    def _resize_img(self, image):
+        width = image.size[0]
+        base = int(width * 1.5)
+        print(f'original {image.size[0]} x {image.size[1]}')
+        resize_image = image.resize((base, int(base * image.size[1] / image.size[0])))
+        print(f'resize {resize_image.size[0]} x {resize_image.size[1]}')
+        return resize_image
