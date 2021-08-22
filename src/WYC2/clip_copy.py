@@ -1,6 +1,6 @@
 import subprocess
 import logging
-from utils import _logger_setup
+from utils import _logger_setup, time_func
 
 
 class ClipCopy():
@@ -12,6 +12,7 @@ class ClipCopy():
         clip board に対象のデータをコピーする
         """
     @classmethod
+    @time_func(logger)
     def copy(cls, data):
         try:
             subprocess.run("pbcopy", universal_newlines=True, input=data)

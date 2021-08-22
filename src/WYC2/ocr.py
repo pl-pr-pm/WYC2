@@ -5,16 +5,17 @@ import pyocr
 import pyocr.builders
 import logging
 import config
-from src.WYC2.utils import _logger_setup
+from src.WYC2.utils import _logger_setup, time_func
 import re
 
 """
 対象の画像をOCRする
 """
+logger = _logger_setup(logging.DEBUG)
 
 class OCR():
     def __init__(self):
-        self.logger = _logger_setup(logging.DEBUG)
+        #self.logger = _logger_setup(logging.DEBUG)
         self.tool = self._init_ocr_tool()
 
         """
@@ -23,11 +24,11 @@ class OCR():
     def _init_ocr_tool(self):
         tools = pyocr.get_available_tools()
         if len(tools) == 0:
-            self.logger.error("No OCR tool found")
-            self.logger.error("System finished")
+            ogger.error("No OCR tool found")
+            logger.error("System finished")
             sys.exit(1)
         tool = tools[0]
-        self.logger.debug("Will use tool '%s'" % (tool.get_name()))
+        logger.debug("Will use tool '%s'" % (tool.get_name()))
         return tool
 
         """
@@ -41,13 +42,15 @@ class OCR():
         str: retText
         OCR結果の文章
         """
+
+    @time_func(logger)
     def analysis(self, target_file):
         text = self.tool.image_to_string(
              Image.open(target_file),
              lang=config.LANG,
              builder=pyocr.builders.TextBuilder(tesseract_layout=6)
         )
-        self.logger.debug("OCR Result: '%s'" % (text))
+        logger.debug("OCR Result: '%s'" % (text))
 
         # 空白をトリミング
         retText = self._trim_jpn_space(text)
@@ -73,6 +76,7 @@ class OCR():
         str: text
         空白をトリミングした文章
         """
+    @time_func(logger)
     def _trim_jpn_space(self, text):
         r = re.compile(r'^[a-zA-Z]+$')
         words = text.split(' ')
