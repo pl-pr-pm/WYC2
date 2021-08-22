@@ -2,6 +2,12 @@ from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import PatternMatchingEventHandler
 import time
 from watch_handler import WatchEventHandler
+#from log_init import log
+from utils import _logger_setup
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = _logger_setup(logging.DEBUG)
 
 def main():
     wdir = '.'
