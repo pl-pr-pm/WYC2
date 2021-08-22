@@ -18,7 +18,6 @@ class WatchEventHandler(PatternMatchingEventHandler):
     def __init__(self, patterns=config.TARGET_EXTENTION):
         super().__init__(patterns)
         self.ocr = OCR()
-        #self.message = Message()
 
         """
         ファイル作成時のロジックを実装
